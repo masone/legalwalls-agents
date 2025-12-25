@@ -7,6 +7,7 @@ export const moderationSchema = z.object({
   isCorrected: z.boolean().describe('True if the comment contained spelling or grammatical errors that were corrected'),
   resultingText: z.string().describe('The comment text in English. If the original was not English, this is the translation. If it was English, this is the original text.'),
 
+  // TODO: same author as submitter, instagrams, links, etc.
   category: z.enum([
     'valid',
     'question',
@@ -20,7 +21,28 @@ export const moderationSchema = z.object({
 
 export type ModerationResult = z.infer<typeof moderationSchema>;
 
-export async function moderateComment(comment: string): Promise<ModerationResult> {
+export async function moderateComment(comment: string): Promise<ModerationResult> {  
+  if (comment.length > 1000) {
+    return {
+      category: 'irrelevant',
+      reasoning: 'Comment exceeds character limit.',
+      isTranslated: false,
+      isCorrected: false,
+      resultingText: comment
+    };
+  }
+
+  const moderation = await openai.moderations.create({ input: comment });
+  if (moderation.results[0].flagged) {
+    return {
+      category: 'harmful',
+      reasoning: 'Content flagged by OpenAI safety systems.',
+      isTranslated: false,
+      isCorrected: false,
+      resultingText: comment
+    };
+  }
+
   const response = await openai.responses.create({
     model: "gpt-4o",
     prompt: {
