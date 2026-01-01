@@ -22,7 +22,10 @@ export const moderationSchema = z.object({
 
   validType: z
     .enum(["confirmation", "closed", "illegal", "other"])
-    .describe("When classified as 'valid', the nature of the comment based on its content").nullable(),
+    .describe(
+      "When classified as 'valid', the nature of the comment based on its content",
+    )
+    .nullable(),
 
   reasoning: z
     .string()
