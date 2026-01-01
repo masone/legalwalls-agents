@@ -16,10 +16,13 @@ export const moderationSchema = z.object({
       "The comment text in English. If the original was not English, this is the translation. If it was English, this is the original text.",
     ),
 
-  // TODO: same author as submitter, instagrams, links, etc.
   category: z
-    .enum(["valid", "question", "irrelevant", "harmful", "report"])
+    .enum(["valid", "question", "irrelevant", "harmful"])
     .describe("The classification of the comment based on its content"),
+
+  validType: z
+    .enum(["confirmation", "closed", "illegal", "other"])
+    .describe("When classified as 'valid', the nature of the comment based on its content").nullable(),
 
   reasoning: z
     .string()
@@ -37,6 +40,7 @@ export async function moderateComment(
       reasoning: "Comment exceeds character limit.",
       isTranslated: false,
       isCorrected: false,
+      validType: null,
       resultingText: comment,
     };
   }
@@ -49,7 +53,7 @@ export async function moderateComment(
       model: "gpt-4o",
       // @ts-ignore - Guardrails results property
       prompt: {
-        id: "pmpt_694d565c232c8193bc9743d0364b844c0ec0781f6c9a1ed0",
+        id: "pmpt_6956b67de8e48195bad94e72e930b59f0decd9b208c49330",
         variables: {
           comment,
         },
@@ -73,6 +77,7 @@ export async function moderateComment(
         reasoning: "Comment flagged by guardrails: " + (error as Error).message,
         isTranslated: false,
         isCorrected: false,
+        validType: null,
         resultingText: comment,
       };
     }
