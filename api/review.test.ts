@@ -115,10 +115,11 @@ describe("api/review", () => {
     const handler = (await import("./review")).default;
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () => JSON.stringify({
-        id: 1,
-        comments: [{ id: 2, body: "other comment" }],
-      }),
+      text: async () =>
+        JSON.stringify({
+          id: 1,
+          comments: [{ id: 2, body: "other comment" }],
+        }),
     } as Response);
 
     const { req, res } = createMocks({
@@ -147,10 +148,11 @@ describe("api/review", () => {
     // Mock Wall API response
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () => JSON.stringify({
-        id: 1,
-        comments: [mockComment],
-      }),
+      text: async () =>
+        JSON.stringify({
+          id: 1,
+          comments: [mockComment],
+        }),
     } as Response);
 
     // Mock OpenAI response
@@ -179,10 +181,11 @@ describe("api/review", () => {
     // Mock Wall API response
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () => JSON.stringify({
-        id: 1,
-        comments: [mockComment],
-      }),
+      text: async () =>
+        JSON.stringify({
+          id: 1,
+          comments: [mockComment],
+        }),
     } as Response);
 
     // Mock OpenAI failure
