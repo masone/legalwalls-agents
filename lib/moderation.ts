@@ -41,7 +41,8 @@ export async function moderateComment(
     };
   }
 
-  const client = await clientWithGuardrails();
+  const client = await clientWithGuardrails(); // Temporary until Responses API supports guardrails
+  // const client = openai;
 
   try {
     const response = await client.responses.create({
