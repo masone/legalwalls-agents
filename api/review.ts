@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { moderateComment } from "../lib/moderation";
 import { loadWall } from "../lib/api";
+import { isAuthorized } from "../lib/auth";
 
 interface Comment {
   id: number;
@@ -10,20 +11,11 @@ interface Comment {
   created_at: string;
 }
 
-const validateToken = (header: string | undefined) => {
-  const token = process.env.API_KEY;
-  if (!token || !header) {
-    return false;
-  }
-
-  return header === `Bearer ${token}`;
-};
-
 export default async function handler(
   request: VercelRequest,
   response: VercelResponse,
 ) {
-  if (process.env.NODE_ENV != "development" && !validateToken(request.headers.authorization)) {
+  if (!isAuthorized(request)) {
     return response.status(401).json({ error: "Unauthorized" });
   }
 
