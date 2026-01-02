@@ -9,7 +9,7 @@ export async function moderateComment(
 ): Promise<ModerationResult> {
   const promptId = "pmpt_6956b67de8e48195bad94e72e930b59f0decd9b208c49330";
 
-  if (comment.length > 1000) {
+  if (comment.length > 2000) {
     return {
       category: "irrelevant",
       reasoning: "Comment exceeds character limit.",
