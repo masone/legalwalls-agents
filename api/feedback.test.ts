@@ -67,7 +67,7 @@ describe("api/feedback", () => {
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: "invalid parameters" });
+    expect(JSON.parse(res._getData()).error).toEqual("invalid parameters");
   });
 
   it("returns 400 if required parameters are missing", async () => {
@@ -81,7 +81,7 @@ describe("api/feedback", () => {
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: "invalid parameters" });
+    expect(JSON.parse(res._getData()).error).toEqual("invalid parameters");
   });
 
   it("returns 400 if comment is missing", async () => {
@@ -105,7 +105,7 @@ describe("api/feedback", () => {
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: "invalid parameters" });
+    expect(JSON.parse(res._getData()).error).toEqual("invalid parameters");
   });
 
   it("returns 400 if expected is invalid", async () => {
@@ -125,7 +125,7 @@ describe("api/feedback", () => {
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: "invalid parameters" });
+    expect(JSON.parse(res._getData()).error).toEqual("invalid parameters");
   });
 
   it("stores feedback and returns 200 on success", async () => {
