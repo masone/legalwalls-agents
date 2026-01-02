@@ -13,7 +13,10 @@ export default async function handler(
 
   const parsed = feedbackRequestSchema.safeParse(request.body);
   if (!parsed.success) {
-    return response.status(400).json({ error: "invalid parameters" });
+    return response.status(400).json({
+      error: "invalid parameters",
+      details: parsed.error.format(),
+    });
   }
 
   const feedback = await storeFeedback(parsed.data);

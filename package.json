@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "vc dev --listen 3001",
     "format": "prettier --write .",
-    "dataset": "ts-node bin/dataset.ts > dataset.jsonl"
+    "dataset": "ts-node bin/dataset.ts > dataset.jsonl && cat dataset.jsonl"
   },
   "dependencies": {
     "@openai/guardrails": "^0.2.1",

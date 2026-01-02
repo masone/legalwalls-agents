@@ -2,7 +2,7 @@ import { listFeedback } from "../lib/feedback";
 import { FeedbackRequest } from "../lib/schemas";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 function formatFeedbackAsJsonl(feedbackItems: FeedbackRequest[]): string {
   return feedbackItems
