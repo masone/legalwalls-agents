@@ -18,7 +18,7 @@ export const moderationSchema = z.object({
     .describe("The classification of the comment based on its content"),
 
   validType: z
-    .enum(["confirmation", "closed", "illegal", "other"])
+    .enum(["confirmation", "closed", "illegal", "private", "other"])
     .describe(
       "When classified as 'valid', the nature of the comment based on its content",
     )

@@ -7,7 +7,7 @@ interface Comment {
   id: number;
   body: string;
   feedback: "confirmation" | "report";
-  report_type: "illegal" | null;
+  report_type: "illegal" | "private" | "closed" | null;
   created_at: string;
 }
 
