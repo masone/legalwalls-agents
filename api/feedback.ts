@@ -12,7 +12,7 @@ export default async function handler(
 
   const { responseId, vote, reason } = request.body ?? {};
 
-  if (!responseId || !vote || !reason) {
+  if (!responseId || vote === undefined || !reason) {
     return response.status(400).json({ error: "invalid parameters" });
   }
 

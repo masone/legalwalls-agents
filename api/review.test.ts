@@ -1,15 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createMocks } from "node-mocks-http";
 
-// Mock the OpenAI Guardrails package
-const { mockResponsesCreate } = vi.hoisted(() => {
-  return { mockResponsesCreate: vi.fn() };
+const { mockResponsesCreate, mockBlobPut } = vi.hoisted(() => {
+  return {
+    mockResponsesCreate: vi.fn(),
+    mockBlobPut: vi.fn(),
+  };
 });
 
 vi.mock("openai", () => {
   return {
     default: class OpenAI {
-      constructor() {}
+      responses = {
+        create: mockResponsesCreate,
+      };
     },
   };
 });
@@ -25,17 +29,24 @@ vi.mock("@openai/guardrails", () => ({
   GuardrailTripwireTriggered: class extends Error {},
 }));
 
+vi.mock("@vercel/blob", () => ({
+  put: mockBlobPut,
+  head: vi.fn(),
+}));
+
 describe("api/review", () => {
   const validToken = "test-token";
   const apiUrl = "http://api.example.com";
 
   beforeEach(() => {
-    vi.resetModules(); // Reset modules to ensure fresh import
-    vi.clearAllMocks(); // Clear mock history but keep implementations
+    vi.resetModules();
+    vi.clearAllMocks();
     process.env.API_KEY = validToken;
     process.env.API_URL = apiUrl;
+    process.env.NODE_ENV = "production";
+    process.env.VERCEL_ENV = "test";
+    mockBlobPut.mockResolvedValue({ url: "https://blob.vercel.com/test" });
 
-    // Mock global fetch
     vi.stubGlobal("fetch", vi.fn());
   });
 
@@ -70,12 +81,31 @@ describe("api/review", () => {
     expect(JSON.parse(res._getData())).toEqual({ error: "Unauthorized" });
   });
 
+  it("skips auth in development mode", async () => {
+    process.env.NODE_ENV = "development";
+    const handler = (await import("./review")).default;
+
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      text: async () => "null",
+    } as Response);
+
+    const { req, res } = createMocks({
+      method: "GET",
+      query: { wallId: "1", commentId: "1" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(404);
+  });
+
   it("returns 400 if wallId or commentId is missing", async () => {
     const handler = (await import("./review")).default;
     const { req, res } = createMocks({
       method: "GET",
       headers: { authorization: `Bearer ${validToken}` },
-      query: { wallId: "1" }, // Missing commentId
+      query: { wallId: "1" },
     });
 
     await handler(req as any, res as any);
@@ -142,10 +172,10 @@ describe("api/review", () => {
       isCorrected: false,
       resultingText: "suspicious comment",
       category: "valid",
+      validType: null,
       reasoning: "looks fine",
     };
 
-    // Mock Wall API response
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       text: async () =>
@@ -155,8 +185,10 @@ describe("api/review", () => {
         }),
     } as Response);
 
-    // Mock OpenAI response
     mockResponsesCreate.mockResolvedValue({
+      id: "resp_123",
+      created_at: Math.floor(Date.now() / 1000),
+      model: "gpt-4o",
       output_text: JSON.stringify(mockModerationResult),
     });
 
@@ -170,15 +202,24 @@ describe("api/review", () => {
 
     expect(mockResponsesCreate).toHaveBeenCalled();
     expect(res._getStatusCode()).toBe(200);
-    expect(JSON.parse(res._getData())).toEqual(mockModerationResult);
+    expect(JSON.parse(res._getData())).toEqual({
+      responseId: "resp_123",
+      ...mockModerationResult,
+    });
   });
 
-  it("returns 500 if moderation fails", async () => {
+  it("logs moderation result to blob storage", async () => {
     const handler = (await import("./review")).default;
-    const mockComment = { id: 1, body: "comment" };
-    const errorMessage = "OpenAI error";
+    const mockComment = { id: 1, body: "test comment" };
+    const mockModerationResult = {
+      isTranslated: false,
+      isCorrected: false,
+      resultingText: "test comment",
+      category: "valid",
+      validType: null,
+      reasoning: "looks fine",
+    };
 
-    // Mock Wall API response
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       text: async () =>
@@ -188,7 +229,42 @@ describe("api/review", () => {
         }),
     } as Response);
 
-    // Mock OpenAI failure
+    mockResponsesCreate.mockResolvedValue({
+      id: "resp_456",
+      created_at: Math.floor(Date.now() / 1000),
+      model: "gpt-4o",
+      output_text: JSON.stringify(mockModerationResult),
+    });
+
+    const { req, res } = createMocks({
+      method: "GET",
+      headers: { authorization: `Bearer ${validToken}` },
+      query: { wallId: "1", commentId: "1" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(mockBlobPut).toHaveBeenCalledWith(
+      expect.stringContaining("resp_456.json"),
+      expect.any(String),
+      expect.objectContaining({ contentType: "application/json" }),
+    );
+  });
+
+  it("returns 500 if moderation fails", async () => {
+    const handler = (await import("./review")).default;
+    const mockComment = { id: 1, body: "comment" };
+    const errorMessage = "OpenAI error";
+
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          id: 1,
+          comments: [mockComment],
+        }),
+    } as Response);
+
     mockResponsesCreate.mockRejectedValue(new Error(errorMessage));
 
     const { req, res } = createMocks({
