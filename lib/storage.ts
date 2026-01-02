@@ -28,11 +28,11 @@ export type Feedback = z.infer<typeof feedbackSchema>;
 const namespace = process.env.VERCEL_ENV || "development";
 
 export function moderationResultLogPath(responseId: string): string {
-  return `${namespace}/moderation/${responseId}.json`;
+  return `${namespace}/comment-${responseId}.json`;
 }
 
 export function moderationFeedbackLogPath(responseId: string): string {
-  return `${namespace}/feedback/${responseId}.json`;
+  return `${namespace}/feedback-${responseId}.json`;
 }
 
 export async function logModerationResult(entry: ModerationResultLog) {
