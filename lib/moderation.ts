@@ -1,5 +1,5 @@
 import { zodTextFormat } from "openai/helpers/zod";
-import { parseResponse, clientWithGuardrails } from "./openai";
+import { parseResponse, openai } from "./openai";
 import { GuardrailTripwireTriggered } from "@openai/guardrails";
 import { z } from "zod";
 
@@ -48,8 +48,8 @@ export async function moderateComment(
     };
   }
 
-  const client = await clientWithGuardrails(); // Temporary until Responses API supports guardrails
-  // const client = openai;
+  // const client = await clientWithGuardrails(); // Temporary until Responses API supports guardrails
+  const client = openai;
 
   try {
     const response = await client.responses.create({
