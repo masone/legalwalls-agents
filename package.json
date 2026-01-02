@@ -7,13 +7,14 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --run",
     "typecheck": "tsc --noEmit",
     "dev": "vc dev --listen 3001",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@openai/guardrails": "^0.2.1",
+    "@vercel/blob": "^1.0.0",
     "openai": "^6.15.0",
     "zod": "^4.2.1"
   },

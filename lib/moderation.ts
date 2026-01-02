@@ -1,5 +1,6 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { parseResponse, openai } from "./openai";
+import { logModerationResult } from "./storage";
 import { GuardrailTripwireTriggered } from "@openai/guardrails";
 import { z } from "zod";
 
@@ -35,8 +36,11 @@ export const moderationSchema = z.object({
 export type ModerationResult = z.infer<typeof moderationSchema>;
 
 export async function moderateComment(
+  id: number,
   comment: string,
-): Promise<ModerationResult> {
+): Promise<ModerationResult & { responseId?: string }> {
+  const promptId = "pmpt_6956b67de8e48195bad94e72e930b59f0decd9b208c49330";
+
   if (comment.length > 1000) {
     return {
       category: "irrelevant",
@@ -56,7 +60,7 @@ export async function moderateComment(
       model: "gpt-4o",
       // @ts-ignore - Guardrails results property
       prompt: {
-        id: "pmpt_6956b67de8e48195bad94e72e930b59f0decd9b208c49330",
+        id: promptId,
         variables: {
           comment,
         },
@@ -72,7 +76,18 @@ export async function moderateComment(
       throw new Error("No output_text returned from Responses API");
     }
 
-    return parseResponse(responseText, moderationSchema);
+    const parsedResult = parseResponse(responseText, moderationSchema);
+
+    await logModerationResult({
+      responseId: response.id,
+      commentId: id,
+      promptId,
+      createdAt: new Date(response.created_at * 1000).toISOString(),
+      comment,
+      moderationResult: parsedResult,
+    });
+
+    return { responseId: response.id, ...parsedResult };
   } catch (error) {
     if (error instanceof GuardrailTripwireTriggered) {
       return {

@@ -23,7 +23,7 @@ export default async function handler(
   request: VercelRequest,
   response: VercelResponse,
 ) {
-  if (!validateToken(request.headers.authorization)) {
+  if (process.env.NODE_ENV != "development" && !validateToken(request.headers.authorization)) {
     return response.status(401).json({ error: "Unauthorized" });
   }
 
@@ -47,8 +47,8 @@ export default async function handler(
   }
 
   try {
-    const result = await moderateComment(comment.body);
-    return response.status(200).json(result);
+    const moderationResult = await moderateComment(comment.id, comment.body);
+    return response.status(200).json(moderationResult);
   } catch (error: any) {
     return response.status(500).json({ error: error.message });
   }
