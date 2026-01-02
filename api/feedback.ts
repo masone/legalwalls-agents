@@ -17,7 +17,10 @@ export default async function handler(
   }
 
   try {
-    const feedbackLog = await saveModerationFeedback(responseId, { vote, reason });
+    const feedbackLog = await saveModerationFeedback(responseId, {
+      vote,
+      reason,
+    });
     return response.status(200).json(feedbackLog);
   } catch (error: any) {
     if (error.message?.includes("not found")) {

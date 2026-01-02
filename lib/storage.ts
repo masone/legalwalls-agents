@@ -61,7 +61,9 @@ export async function saveModerationFeedback(
 ): Promise<ModerationFeedbackLog> {
   const moderationResult = await getModerationResultLog(responseId);
   if (!moderationResult) {
-    throw new Error(`Moderation result not found for responseId: ${responseId}`);
+    throw new Error(
+      `Moderation result not found for responseId: ${responseId}`,
+    );
   }
 
   const feedbackLog: ModerationFeedbackLog = {
