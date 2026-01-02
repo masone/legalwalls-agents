@@ -1,14 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { isAuthorized } from "../lib/auth";
-import { moderationSchema } from "../lib/moderation";
 import { storeFeedback } from "../lib/feedback";
-import { z } from "zod";
-
-export const feedbackRequestSchema = z.object({
-  id: z.string(),
-  comment: z.string(),
-  expected: moderationSchema,
-});
+import { feedbackRequestSchema } from "../lib/schemas";
 
 export default async function handler(
   request: VercelRequest,

@@ -1,12 +1,9 @@
-import { put } from "@vercel/blob";
-import { feedbackRequestSchema } from "../api/feedback";
-import { z } from "zod";
-
-export type Feedback = z.infer<typeof feedbackRequestSchema>;
+import { put, list } from "@vercel/blob";
+import { feedbackRequestSchema, FeedbackRequest } from "./schemas";
 
 const namespace = process.env.VERCEL_ENV || "development";
 
-export async function storeFeedback(feedback: Feedback): Promise<Feedback> {
+export async function storeFeedback(feedback: FeedbackRequest): Promise<FeedbackRequest> {
   await put(
     `${namespace}/feedback-${feedback.id}.json`,
     JSON.stringify(feedback),
@@ -16,4 +13,21 @@ export async function storeFeedback(feedback: Feedback): Promise<Feedback> {
     },
   );
   return feedback;
+}
+
+export async function listFeedback(limit: number = 100): Promise<FeedbackRequest[]> {
+  const { blobs } = await list({
+    prefix: `${namespace}/feedback-`,
+    limit,
+  });
+
+  const feedbackItems = await Promise.all(
+    blobs.map(async (blob) => {
+      const response = await fetch(blob.url);
+      const json = await response.json();
+      return feedbackRequestSchema.parse(json);
+    }),
+  );
+
+  return feedbackItems;
 }
