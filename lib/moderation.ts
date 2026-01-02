@@ -1,6 +1,5 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { parseResponse, openai } from "./openai";
-import { logModerationResult } from "./storage";
 import { GuardrailTripwireTriggered } from "@openai/guardrails";
 import { z } from "zod";
 
@@ -38,7 +37,7 @@ export type ModerationResult = z.infer<typeof moderationSchema>;
 export async function moderateComment(
   id: number,
   comment: string,
-): Promise<ModerationResult & { responseId?: string }> {
+): Promise<ModerationResult> {
   const promptId = "pmpt_6956b67de8e48195bad94e72e930b59f0decd9b208c49330";
 
   if (comment.length > 1000) {
@@ -76,18 +75,7 @@ export async function moderateComment(
       throw new Error("No output_text returned from Responses API");
     }
 
-    const parsedResult = parseResponse(responseText, moderationSchema);
-
-    await logModerationResult({
-      responseId: response.id,
-      commentId: id,
-      promptId,
-      createdAt: new Date(response.created_at * 1000).toISOString(),
-      comment,
-      moderationResult: parsedResult,
-    });
-
-    return { responseId: response.id, ...parsedResult };
+    return parseResponse(responseText, moderationSchema);
   } catch (error) {
     if (error instanceof GuardrailTripwireTriggered) {
       return {

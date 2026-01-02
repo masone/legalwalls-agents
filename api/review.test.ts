@@ -202,53 +202,7 @@ describe("api/review", () => {
 
     expect(mockResponsesCreate).toHaveBeenCalled();
     expect(res._getStatusCode()).toBe(200);
-    expect(JSON.parse(res._getData())).toEqual({
-      responseId: "resp_123",
-      ...mockModerationResult,
-    });
-  });
-
-  it("logs moderation result to blob storage", async () => {
-    const handler = (await import("./review")).default;
-    const mockComment = { id: 1, body: "test comment" };
-    const mockModerationResult = {
-      isTranslated: false,
-      isCorrected: false,
-      resultingText: "test comment",
-      category: "valid",
-      validType: null,
-      reasoning: "looks fine",
-    };
-
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      text: async () =>
-        JSON.stringify({
-          id: 1,
-          comments: [mockComment],
-        }),
-    } as Response);
-
-    mockResponsesCreate.mockResolvedValue({
-      id: "resp_456",
-      created_at: Math.floor(Date.now() / 1000),
-      model: "gpt-4o",
-      output_text: JSON.stringify(mockModerationResult),
-    });
-
-    const { req, res } = createMocks({
-      method: "GET",
-      headers: { authorization: `Bearer ${validToken}` },
-      query: { wallId: "1", commentId: "1" },
-    });
-
-    await handler(req as any, res as any);
-
-    expect(mockBlobPut).toHaveBeenCalledWith(
-      expect.stringContaining("resp_456.json"),
-      expect.any(String),
-      expect.objectContaining({ contentType: "application/json" }),
-    );
+    expect(JSON.parse(res._getData())).toEqual(mockModerationResult);
   });
 
   it("returns 500 if moderation fails", async () => {

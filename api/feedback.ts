@@ -1,6 +1,14 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { saveModerationFeedback } from "../lib/storage";
 import { isAuthorized } from "../lib/auth";
+import { moderationSchema } from "../lib/moderation";
+import { storeFeedback } from "../lib/feedback";
+import { z } from "zod";
+
+export const feedbackRequestSchema = z.object({
+  id: z.string(),
+  comment: z.string(),
+  expected: moderationSchema,
+});
 
 export default async function handler(
   request: VercelRequest,
@@ -10,22 +18,11 @@ export default async function handler(
     return response.status(401).json({ error: "Unauthorized" });
   }
 
-  const { responseId, vote, reason } = request.body ?? {};
-
-  if (!responseId || vote === undefined || !reason) {
+  const parsed = feedbackRequestSchema.safeParse(request.body);
+  if (!parsed.success) {
     return response.status(400).json({ error: "invalid parameters" });
   }
 
-  try {
-    const feedbackLog = await saveModerationFeedback(responseId, {
-      vote,
-      reason,
-    });
-    return response.status(200).json(feedbackLog);
-  } catch (error: any) {
-    if (error.message?.includes("not found")) {
-      return response.status(404).json({ error: error.message });
-    }
-    return response.status(500).json({ error: error.message });
-  }
+  const feedback = await storeFeedback(parsed.data);
+  return response.status(200).json(feedback);
 }
