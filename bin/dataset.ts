@@ -1,5 +1,5 @@
 import { listFeedback } from "../lib/feedback";
-import { FeedbackRequest } from "../lib/schemas";
+import { FeedbackRequest } from "../lib/schemas/feedback";
 import dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
