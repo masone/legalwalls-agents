@@ -1,7 +1,7 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { parseResponse, openai } from "./openai";
 import { GuardrailTripwireTriggered } from "@openai/guardrails";
-import { moderationSchema, ModerationResult } from "./schemas";
+import { moderationSchema, ModerationResult } from "./schemas/moderation";
 
 export async function moderateComment(
   id: number,

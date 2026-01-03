@@ -1,5 +1,5 @@
 import { put, list } from "@vercel/blob";
-import { feedbackRequestSchema, FeedbackRequest } from "./schemas";
+import { feedbackRequestSchema, FeedbackRequest } from "./schemas/feedback";
 
 const namespace = process.env.VERCEL_ENV || "development";
 

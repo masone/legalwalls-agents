@@ -30,11 +30,3 @@ export const moderationSchema = z.object({
 });
 
 export type ModerationResult = z.infer<typeof moderationSchema>;
-
-export const feedbackRequestSchema = z.object({
-  id: z.string(),
-  comment: z.string(),
-  expected: moderationSchema,
-});
-
-export type FeedbackRequest = z.infer<typeof feedbackRequestSchema>;
