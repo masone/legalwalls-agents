@@ -188,7 +188,6 @@ describe("api/review", () => {
     mockResponsesCreate.mockResolvedValue({
       id: "resp_123",
       created_at: Math.floor(Date.now() / 1000),
-      model: "gpt-4o",
       output_text: JSON.stringify(mockModerationResult),
     });
 

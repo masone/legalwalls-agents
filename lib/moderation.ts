@@ -25,7 +25,6 @@ export async function moderateComment(
 
   try {
     const response = await client.responses.create({
-      model: "gpt-4o",
       // @ts-ignore - Guardrails results property
       prompt: {
         id: promptId,
