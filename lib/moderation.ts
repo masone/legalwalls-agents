@@ -1,7 +1,7 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { parseResponse, openai } from "./openai";
 import { GuardrailTripwireTriggered } from "@openai/guardrails";
-import { moderationSchema, ModerationResult } from "./schemas";
+import { moderationSchema, ModerationResult } from "./schemas/moderation";
 
 export async function moderateComment(
   id: number,
@@ -9,7 +9,7 @@ export async function moderateComment(
 ): Promise<ModerationResult> {
   const promptId = "pmpt_6956b67de8e48195bad94e72e930b59f0decd9b208c49330";
 
-  if (comment.length > 2000) {
+  if (comment.length > 3000) {
     return {
       category: "irrelevant",
       reasoning: "Comment exceeds character limit.",
@@ -25,7 +25,6 @@ export async function moderateComment(
 
   try {
     const response = await client.responses.create({
-      model: "gpt-4o",
       // @ts-ignore - Guardrails results property
       prompt: {
         id: promptId,

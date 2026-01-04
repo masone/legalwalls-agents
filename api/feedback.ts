@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { isAuthorized } from "../lib/auth";
 import { storeFeedback } from "../lib/feedback";
-import { feedbackRequestSchema } from "../lib/schemas";
+import { feedbackRequestSchema } from "../lib/schemas/feedback";
 
 export default async function handler(
   request: VercelRequest,
