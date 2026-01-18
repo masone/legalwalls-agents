@@ -31,7 +31,7 @@ export default async function handler(
     return response.status(404).json({ error: "Wall not found" });
   }
 
-  const comment: Comment = wall.comments.find(
+  const comment: Comment | undefined = wall.comments.find(
     (c: any) => c.id === Number(commentId),
   );
   if (!comment) {
