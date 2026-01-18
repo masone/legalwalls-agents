@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { ErrorCode } from "@modelcontextprotocol/sdk/types.js";
-import { server } from "../lib/mcp.js";
+import { server } from "../lib/mcp";
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   res.setHeader("Content-Type", "application/json");

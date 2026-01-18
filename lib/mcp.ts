@@ -3,11 +3,11 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import * as api from "./api.js";
+import { loadWalls, loadWall } from "./api";
 
 async function loadWallsHandler() {
   try {
-    const walls = await api.loadWalls();
+    const walls = await loadWalls();
     return {
       type: "text" as const,
       text: JSON.stringify(walls),
@@ -31,7 +31,7 @@ async function loadWallHandler(wallId: string) {
         text: JSON.stringify({ error: `Invalid wall ID: ${wallId}` }),
       };
     }
-    const wall = await api.loadWall(wallIdNum);
+    const wall = await loadWall(wallIdNum);
     return {
       type: "text" as const,
       text: JSON.stringify(wall),
