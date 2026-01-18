@@ -1,0 +1,48 @@
+# Mymaps, KML
+https://www.wienxtra.at/jugendinfo/wienerwand/
+https://dosenkunst.de/orte-fur-graffiti-im-rhein-main-gebiet/
+https://www.google.com/maps/d/u/0/viewer?mid=1eHAzjhFPB9S0Cwg5yUTF6kZRentYe5Vj&ll=48.458400300000015%2C7.937461199999989&z=12
+https://www.huelva.es/portal/es/paginas/iniciativa-muros-libres
+
+# WP Go maps
+https://spraycity.at/legal-walls-wien/
+https://spraycity.at/legal-walls-kaernten/
+https://spraycity.at/legal-walls-niederoesterreich/
+https://spraycity.at/legal-walls-oberoesterreich/
+https://spraycity.at/legal-walls-salzburg/
+https://spraycity.at/legal-walls-steiermark/
+https://spraycity.at/legal-walls-tirol/
+https://spraycity.at/legal-walls-vorarlberg/
+
+# Embedded Maps
+https://www.graffitifun.nl/locaties/
+https://diebuntenev.jimdofree.com/schwabenwand/
+https://www.glasgowlegalwalls.com/
+
+# Google maps link
+https://www.graffiti-netz-hannover.de/legale-waende/
+https://wholestreetasso.fr/murs-dexpression-libre/
+
+# What 3 words
+https://www.cheltenham.gov.uk/info/55/street_care_and_cleaning/1547/graffiti/
+
+# custom google map
+https://www.graffiti-in-rostock.de/legale-waende.php
+https://www.rue.bzh/liste-murs
+https://www.graffolution.eu/fr/2016-03-18-13-40-42/murs-autorises
+
+# custom leaflet
+https://www.gatineau.ca/portail/default.aspx?p=guichet_municipal%2Ftags_graffitis%2Fmurs_tunnels_autorises
+
+# custom openstreetmap
+https://hallsoffame-mg.de/karte/
+
+# custom umap
+https://rouen.fr/streetart
+
+## todo
+
+
+
+guide
+https://spraycity.at/legal-walls-how-to-use-guide/

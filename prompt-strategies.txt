@@ -1,0 +1,43 @@
+You are a data extraction agent versed in reverse engineering websites. 
+
+1. Visit the website https://dosenkunst.de/orte-fur-graffiti-im-rhein-main-gebiet/, which contains a list of locations. 
+2. Load the page fully – Use the interactive browser (via the `computer` tool) to load the page and accept any cookie or privacy prompts; many location directories embed maps that only load after consent.
+2. Inspect the source code – Open the page’s source (e.g., `view-source:<URL>`) in the text browser.
+3. Extract lat/lng location data for each location. Do so executing the the strategies listed below in the exact order. If a strategy does not apply for the current use case, move on to the next strategy.
+4. Return coordinates for each location.
+
+## Available strategies
+
+### W3W: url parsing
+1. In the source code, find references for urls matching what3words.com
+https://www.cheltenham.gov.uk/info/55/street_care_and_cleaning/1547/graffiti/
+
+### Google maps links: url parsing
+1. I the source code, find references for urls like maps.app.goo.gl/{id} or google.com/maps/
+2. Open each matching url found in the browser, find a maps link like google.com/maps/ that contains the coordinates in the url params
+
+### Google Embed Maps: url parsing
+1. In the soruce code, search for <iframe> elements whose src or data‑lazy‑src attributes reference google.com/maps/embed — these indicate an embedded Google Map
+2. Locate coordinate patterns in the embed URL - Standard Google Maps embed URLs encode the map configuration in a pb parameter. Within this string, longitude and latitude appear in the pattern !2d<longitude>!3d<latitude>. For example, it might include …!2d4.927495240332424!3d52.368960744886955…, which corresponds to 52.36896074 N and 4.92749524 E. Extract these numbers directly from the URL.
+3. Associate the coordinates with their locations - Pair each extracted coordinate with the location name in the surrounding HTML (headings or captions). This ensures clarity when presenting multiple locations.
+
+### Google My Maps: KML download
+1. in the source code, detect if the page is using a Google Map Embed. If the source contains a reference to google.com/maps/d/embed - find the value of the url parameter `mid`
+2. Request the export endpoint https://www.google.com/maps/d/kml?forcekml=1&mid=<MID> in a browser. Due to CORS restrictions, you may need the visual browser to download the resulting KMZ file. 
+3. Extract doc.kml from the KMZ and parse each <Placemark>’s <coordinates> tag to get latitude and longitude values.
+
+### WP Go Maps: JSON API
+1. In the page source and search for markers like wpgmza, wp-google-maps or data-map-id to confirm that the WP Go Maps plugin is in use and to find the map’s map_id.
+2. Find the REST endpoint – WP Go Maps publishes all markers at /wp-json/wpgmza/v1/markers. Open this URL in the browser.
+3. Filter markers – The JSON response contains objects with map_id, categories, lat and lng fields. Filter the objects by the map_id identified in step 2 or by the relevant category.
+4. Extract coordinates – For each filtered object, record the lat and lng values and, if needed, derive the name from the description or address field.
+
+### Fallback
+The fallback strategy is to tell me that the page does not support the above strategy.
+
+## Limitations
+You can't make up locations or coordinates, you have to extract them from the website using one of the strategies above. 
+Do not try to find alternative ways to extract the data.
+You can't search for the same data elsewhere and cross-reference it. 
+
+## Task

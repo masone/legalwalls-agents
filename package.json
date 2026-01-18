@@ -12,7 +12,8 @@
     "dev": "vc dev --listen 3001",
     "format": "prettier --write .",
     "lint": "prettier --check .",
-    "dataset": "VERCEL_ENV=production ts-node bin/dataset.ts > dataset.jsonl && cat dataset.jsonl"
+    "dataset": "VERCEL_ENV=production ts-node bin/dataset.ts > dataset.jsonl && cat dataset.jsonl",
+    "discover": "ts-node bin/locations.ts"
   },
   "dependencies": {
     "@openai/guardrails": "^0.2.1",
