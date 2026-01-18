@@ -26,8 +26,10 @@ export default async function handler(
       .json({ error: "wallId & commentId is required" });
   }
 
-  const wall = await loadWall(Number(wallId));
-  if (!wall) {
+  let wall;
+  try {
+    wall = await loadWall(Number(wallId));
+  } catch {
     return response.status(404).json({ error: "Wall not found" });
   }
 

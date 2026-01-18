@@ -38,6 +38,34 @@ describe("api/review", () => {
   const validToken = "test-token";
   const apiUrl = "http://api.example.com";
 
+  const createMockWall = (overrides?: any) => ({
+    id: 1,
+    title: "Test Wall",
+    status: "open",
+    location: {
+      country: "US",
+      name: "New York",
+      lat: 40.7128,
+      lng: -74.006,
+      address: "123 Main St",
+    },
+    locked: null,
+    streetview: {
+      lat: 40.7128,
+      lng: -74.006,
+      zoom: 20,
+      heading: 0,
+      pitch: 0,
+      sphere: true,
+    },
+    nearby_stores: [],
+    nearby_walls: [],
+    description: "A test wall",
+    comments: [],
+    created_at: new Date().toISOString(),
+    ...overrides,
+  });
+
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -85,9 +113,10 @@ describe("api/review", () => {
     process.env.NODE_ENV = "development";
     const handler = (await import("./review")).default;
 
+    const mockWall = createMockWall();
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () => "null",
+      text: async () => JSON.stringify(mockWall),
     } as Response);
 
     const { req, res } = createMocks({
@@ -143,13 +172,13 @@ describe("api/review", () => {
 
   it("returns 404 if comment is not found in the wall", async () => {
     const handler = (await import("./review")).default;
+    const mockWall = createMockWall({
+      comments: [{ id: 2, body: "other comment", feedback: "report", report_type: "private", created_at: new Date().toISOString() }],
+    });
+    
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () =>
-        JSON.stringify({
-          id: 1,
-          comments: [{ id: 2, body: "other comment" }],
-        }),
+      text: async () => JSON.stringify(mockWall),
     } as Response);
 
     const { req, res } = createMocks({
@@ -166,7 +195,7 @@ describe("api/review", () => {
 
   it("returns 200 and moderation result on success", async () => {
     const handler = (await import("./review")).default;
-    const mockComment = { id: 1, body: "suspicious comment" };
+    const mockComment = { id: 1, body: "suspicious comment", feedback: "report" as const, report_type: "private" as const, created_at: new Date().toISOString() };
     const mockModerationResult = {
       isTranslated: false,
       isCorrected: false,
@@ -176,13 +205,13 @@ describe("api/review", () => {
       reasoning: "looks fine",
     };
 
+    const mockWall = createMockWall({
+      comments: [mockComment],
+    });
+
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () =>
-        JSON.stringify({
-          id: 1,
-          comments: [mockComment],
-        }),
+      text: async () => JSON.stringify(mockWall),
     } as Response);
 
     mockResponsesCreate.mockResolvedValue({
@@ -206,16 +235,16 @@ describe("api/review", () => {
 
   it("returns 500 if moderation fails", async () => {
     const handler = (await import("./review")).default;
-    const mockComment = { id: 1, body: "comment" };
+    const mockComment = { id: 1, body: "comment", feedback: "report" as const, report_type: "private" as const, created_at: new Date().toISOString() };
     const errorMessage = "OpenAI error";
+
+    const mockWall = createMockWall({
+      comments: [mockComment],
+    });
 
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      text: async () =>
-        JSON.stringify({
-          id: 1,
-          comments: [mockComment],
-        }),
+      text: async () => JSON.stringify(mockWall),
     } as Response);
 
     mockResponsesCreate.mockRejectedValue(new Error(errorMessage));
