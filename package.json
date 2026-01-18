@@ -15,6 +15,7 @@
     "dataset": "VERCEL_ENV=production ts-node bin/dataset.ts > dataset.jsonl && cat dataset.jsonl"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "@openai/guardrails": "^0.2.1",
     "@vercel/blob": "^1.0.0",
     "@vercel/config": "^0.0.24",
