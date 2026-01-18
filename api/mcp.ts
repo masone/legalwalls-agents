@@ -1,11 +1,9 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { ErrorCode } from "@modelcontextprotocol/sdk/types.js";
-import { server } from "../lib/mcp";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { createServer } from "../lib/mcp";
 
 export default async (req: VercelRequest, res: VercelResponse) => {
-  res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
-  // res.setHeader("Access-Control-Allow-Origin", "https://chatgpt.openai.com");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -16,6 +14,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   // Health check endpoint
   if (req.method === "GET") {
+    res.setHeader("Content-Type", "application/json");
     return res.status(200).json({
       status: "ok",
       server: "legalwalls-mcp",
@@ -23,23 +22,29 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     });
   }
 
-  // MCP request handling
   if (req.method === "POST") {
     try {
-      const body = req.body;
-
-      const result = await (server as any).request(body);
-      return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).json({
-        jsonrpc: "2.0",
-        error: {
-          code: ErrorCode.InternalError,
-          message: `Internal error: ${(error as Error).message}`,
-        },
+      const server = createServer();
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined, // Stateless mode for serverless
       });
-    }
-  }
 
-  return res.status(400).json({ error: "Invalid request" });
+      await server.connect(transport);
+      await transport.handleRequest(req, res, req.body);
+    } catch (error) {
+      if (!res.headersSent) {
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json({
+          jsonrpc: "2.0",
+          error: {
+            code: -32603,
+            message: `Internal error: ${(error as Error).message}`,
+          },
+        });
+      }
+    }
+  } else {
+    res.setHeader("Content-Type", "application/json");
+    res.status(400).json({ error: "Invalid request" });
+  }
 };

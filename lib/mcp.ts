@@ -126,6 +126,4 @@ function createServer() {
   return s;
 }
 
-const server = createServer();
-
-export { server };
+export { createServer };
