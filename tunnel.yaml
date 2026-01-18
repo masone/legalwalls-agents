@@ -1,0 +1,7 @@
+tunnel: 916a0f62-4282-432d-af8f-05e951140386
+credentials-file: ~/.cloudflared/916a0f62-4282-432d-af8f-05e951140386.json
+
+ingress:
+  - hostname: mcp.legal-walls.net
+    service: http://localhost:3001
+  - service: http_status:404

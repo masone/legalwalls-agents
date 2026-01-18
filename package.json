@@ -10,6 +10,7 @@
     "test": "vitest --run",
     "typecheck": "tsc --noEmit",
     "dev": "vc dev --listen 3001",
+    "dev:tunnel": "cloudflared tunnel --config tunnel.yaml run",
     "format": "prettier --write .",
     "lint": "prettier --check .",
     "dataset": "VERCEL_ENV=production ts-node bin/dataset.ts > dataset.jsonl && cat dataset.jsonl"
