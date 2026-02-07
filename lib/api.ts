@@ -5,7 +5,17 @@ const fetchPath = async (path: string, options: RequestInit = {}) => {
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}`);
+    const text = await response.text();
+    let body = text;
+    try {
+      body = JSON.stringify(JSON.parse(text), null, 2);
+    } catch {}
+    console.error(`API request to ${url} failed:`, {
+      status: response.status,
+      headers: Object.fromEntries(response.headers),
+      body,
+    });
+    throw new Error(`API request failed with status ${response.status}: ${text}`);
   }
 
   const text = await response.text();
