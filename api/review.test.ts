@@ -132,7 +132,7 @@ describe("api/review", () => {
     await handler(req as any, res as any);
 
     expect(fetch).toHaveBeenCalledWith(
-      `${apiUrl}/walls/999`,
+      `${apiUrl}/api/walls/999`,
       expect.objectContaining({
         headers: { Authorization: `Bearer ${validToken}` },
       }),
