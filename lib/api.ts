@@ -33,9 +33,9 @@ const fetchPathWithToken = (path: string) => {
 };
 
 export const loadWalls = () => {
-  return fetchPath("/walls");
+  return fetchPath("/api/walls");
 };
 
 export const loadWall = (wallId: number) => {
-  return fetchPathWithToken(`/walls/${wallId}`);
+  return fetchPathWithToken(`/api/walls/${wallId}`);
 };
